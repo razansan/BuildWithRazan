@@ -1,6 +1,6 @@
 # Razan M. Ikhsan - Portfolio Website
 
-A modern, responsive portfolio website inspired by Brittany Chiang's design, customized with Razan M. Ikhsan's personal information, experience, and achievements.
+A modern, responsive portfolio website customized with Razan M. Ikhsan's personal information, experience, and achievements.
 
 ## Features
 
@@ -112,3 +112,4 @@ Design inspiration from Brittany Chiang's portfolio website, customized and adap
 ## License
 
 This project is for personal use. Please respect the original design inspiration and create your own unique adaptations.
+
