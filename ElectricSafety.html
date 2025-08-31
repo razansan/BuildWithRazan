@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrical Safety Calculator - Kalkulator Keselamatan Listrik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Sticky Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .calculator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .safety-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .safety-info h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .safety-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .safety-item {
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .safety-item h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: linear-gradient(45deg, #f56565, #e53e3e);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .formula {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .calculator-card {
+                padding: 20px;
+            }
+
+            .back-button {
+                top: 16px;
+                right: 16px;
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+        }
+    </style>
+  </head>
+  <body>
+      <!-- Sticky Back Button -->
+      <a href="index.html" class="back-button" id="backButton">Kembali ke Beranda</a>
+
+      <div class="container">
+        <header class="header">
+            <h1>⚡ Electrical Safety Calculator</h1>
+            <p>Kalkulator Komprehensif untuk Parameter Keselamatan Listrik</p>
+        </header>
+
+        <div class="calculator-grid">
+            <!-- Earth Leakage Calculator -->
+            <div class="calculator-card">
+                <div class="card-title">
+                    <div class="card-icon">🌍</div>
+                    Earth Leakage Current Calculator
+                </div>
+                <form id="earthLeakageForm">
+                    <div class="form-group">
+                        <label for="voltage">Tegangan (V):</label>
+                        <input type="number" id="voltage" placeholder="220" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resistance">Resistansi Isolasi (MΩ):</label>
+                        <input type="number" id="resistance" step="0.1" placeholder="1.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="capacitance">Kapasitansi (µF):</label>
+                        <input type="number" id="capacitance" step="0.01" placeholder="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="frequency">Frekuensi (Hz):</label>
+                        <input type="number" id="frequency" value="50" required>
+                    </div>
+                    <button type="submit" class="calculate-btn">Hitung Earth Leakage</button>
+                </form>
+                <div id="earthLeakageResult" class="result">
+                    <h4>Hasil Perhitungan:</h4>
+                    <div id="earthLeakageOutput"></div>
+                </div>
+                <div class="formula">
+                    <strong>Formula:</strong><br>
+                    I_leakage = V/R + V × 2π × f × C
+                </div>
+            </div>
+
+            <!-- Short Circuit Calculator -->
+            <div class="calculator-card">
+                <div class="card-title">
+                    <div class="card-icon">⚡</div>
+                    Short Circuit Current Calculator
+                </div>
+                <form id="shortCircuitForm">
+                    <div class="form-group">
+                        <label for="systemVoltage">Tegangan Sistem (V):</label>
+                        <input type="number" id="systemVoltage" placeholder="380" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceImpedance">Impedansi Sumber (Ω):</label>
+                        <input type="number" id="sourceImpedance" step="0.001" placeholder="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cableLength">Panjang Kabel (m):</label>
+                        <input type="number" id="cableLength" placeholder="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cableImpedance">Impedansi Kabel (Ω/km):</label>
+                        <input type="number" id="cableImpedance" step="0.01" placeholder="0.5" required>
+                    </div>
+                    <button type="submit" class="calculate-btn">Hitung Short Circuit</button>
+                </form>
+                <div id="shortCircuitResult" class="result">
+                    <h4>Hasil Perhitungan:</h4>
+                    <div id="shortCircuitOutput"></div>
+                </div>
+                <div class="formula">
+                    <strong>Formula:</strong><br>
+                    I_sc = V / (Z_source + Z_cable)
+                </div>
+            </div>
+
+            <!-- Protective Device Rating Calculator -->
+            <div class="calculator-card">
+                <div class="card-title">
+                    <div class="card-icon">🛡️</div>
+                    Protective Device Rating Calculator
+                </div>
+                <form id="protectiveForm">
+                    <div class="form-group">
+                        <label for="loadCurrent">Arus Beban (A):</label>
+                        <input type="number" id="loadCurrent" placeholder="25" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="diversityFactor">Faktor Diversitas:</label>
+                        <input type="number" id="diversityFactor" step="0.1" value="1.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="safetyFactor">Faktor Keamanan:</label>
+                        <input type="number" id="safetyFactor" step="0.1" value="1.25" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceType">Jenis Perangkat:</label>
+                        <select id="deviceType" required>
+                            <option value="">Pilih Jenis</option>
+                            <option value="mcb">MCB (Miniature Circuit Breaker)</option>
+                            <option value="mccb">MCCB (Molded Case Circuit Breaker)</option>
+                            <option value="fuse">Fuse/Sekering</option>
+                            <option value="rcd">RCD (Residual Current Device)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="calculate-btn">Hitung Rating Proteksi</button>
+                </form>
+                <div id="protectiveResult" class="result">
+                    <h4>Hasil Perhitungan:</h4>
+                    <div id="protectiveOutput"></div>
+                </div>
+                <div class="formula">
+                    <strong>Formula:</strong><br>
+                    I_rating = I_load × Diversity × Safety Factor
+                </div>
+            </div>
+
+            <!-- Grounding Resistance Calculator -->
+            <div class="calculator-card">
+                <div class="card-title">
+                    <div class="card-icon">🔌</div>
+                    Grounding Resistance Calculator
+                </div>
+                <form id="groundingForm">
+                    <div class="form-group">
+                        <label for="rodLength">Panjang Rod (m):</label>
+                        <input type="number" id="rodLength" placeholder="3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rodDiameter">Diameter Rod (mm):</label>
+                        <input type="number" id="rodDiameter" placeholder="16" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="soilResistivity">Resistivitas Tanah (Ω·m):</label>
+                        <input type="number" id="soilResistivity" placeholder="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="burialDepth">Kedalaman Tanam (m):</label>
+                        <input type="number" id="burialDepth" step="0.1" placeholder="0.5" required>
+                    </div>
+                    <button type="submit" class="calculate-btn">Hitung Resistansi Grounding</button>
+                </form>
+                <div id="groundingResult" class="result">
+                    <h4>Hasil Perhitungan:</h4>
+                    <div id="groundingOutput"></div>
+                </div>
+                <div class="formula">
+                    <strong>Formula:</strong><br>
+                    R = (ρ/2πL) × ln(8L/d - 1)
+                </div>
+            </div>
+
+            <!-- Cable Current Capacity Calculator -->
+            <div class="calculator-card">
+                <div class="card-title">
+                    <div class="card-icon">🔌</div>
+                    Cable Current Capacity Calculator
+                </div>
+                <form id="cableForm">
+                    <div class="form-group">
+                        <label for="cableSize">Ukuran Kabel (mm²):</label>
+                        <input type="number" id="cableSize" placeholder="2.5" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="installationMethod">Metode Instalasi:</label>
+                        <select id="installationMethod" required>
+                            <option value="">Pilih Metode</option>
+                            <option value="enclosed">Tertutup (Conduit/Tray)</option>
+                            <option value="open">Terbuka (Open Air)</option>
+                            <option value="buried">Dikubur (Direct Burial)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ambientTemp">Suhu Ambient (°C):</label>
+                        <input type="number" id="ambientTemp" value="30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupingFactor">Faktor Pengelompokan:</label>
+                        <input type="number" id="groupingFactor" step="0.1" value="0.8" required>
+                    </div>
+                    <button type="submit" class="calculate-btn">Hitung Kapasitas Arus</button>
+                </form>
+                <div id="cableResult" class="result">
+                    <h4>Hasil Perhitungan:</h4>
+                    <div id="cableOutput"></div>
+                </div>
+            </div>
+
+            <!-- Voltage Drop Calculator -->
+            <div class="calculator-card">
+                <div class="card-title">
+                    <div class="card-icon">📉</div>
+                    Voltage Drop Calculator
+                </div>
+                <form id="voltageDropForm">
+                    <div class="form-group">
+                        <label for="current">Arus (A):</label>
+                        <input type="number" id="current" placeholder="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="distance">Jarak (m):</label>
+                        <input type="number" id="distance" placeholder="50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="conductorSize">Ukuran Konduktor (mm²):</label>
+                        <input type="number" id="conductorSize" placeholder="2.5" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="powerFactor">Power Factor:</label>
+                        <input type="number" id="powerFactor" step="0.01" value="0.85" min="0" max="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phaseType">Jenis Fase:</label>
+                        <select id="phaseType" required>
+                            <option value="">Pilih Jenis</option>
+                            <option value="single">Single Phase</option>
+                            <option value="three">Three Phase</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="calculate-btn">Hitung Voltage Drop</button>
+                </form>
+                <div id="voltageDropResult" class="result">
+                    <h4>Hasil Perhitungan:</h4>
+                    <div id="voltageDropOutput"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety Information Section -->
+        <div class="safety-info">
+            <h2>📋 Informasi Keselamatan Listrik</h2>
+            <div class="safety-grid">
+                <div class="safety-item">
+                    <h3>🚨 Standar Keselamatan</h3>
+                    <p>Pastikan semua instalasi mengikuti standar SNI 0225:2011 dan IEC 60364 untuk keselamatan instalasi listrik di bangunan.</p>
+                </div>
+                <div class="safety-item">
+                    <h3>⚠️ Batas Aman Earth Leakage</h3>
+                    <p>Arus bocor ke tanah tidak boleh melebihi 30mA untuk RCD dan 500mA untuk instalasi industri sesuai standar keselamatan.</p>
+                </div>
+                <div class="safety-item">
+                    <h3>🔧 Grounding System</h3>
+                    <p>Resistansi grounding harus < 5Ω untuk instalasi umum dan < 1Ω untuk instalasi khusus seperti data center.</p>
+                </div>
+                <div class="safety-item">
+                    <h3>📏 Voltage Drop Limits</h3>
+                    <p>Voltage drop maksimum: 3% untuk pencahayaan dan 5% untuk motor sesuai standar instalasi listrik.</p>
+                </div>
+                <div class="safety-item">
+                    <h3>🛡️ Protective Devices</h3>
+                    <p>Pilih rating perangkat proteksi 125% dari arus beban untuk memastikan proteksi yang optimal tanpa trip yang tidak perlu.</p>
+                </div>
+                <div class="safety-item">
+                    <h3>🔍 Inspeksi Berkala</h3>
+                    <p>Lakukan inspeksi dan testing berkala setiap 1-5 tahun tergantung jenis instalasi untuk memastikan keselamatan berkelanjutan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Earth Leakage Calculator
+        document.getElementById('earthLeakageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const resistance = parseFloat(document.getElementById('resistance').value);
+            const capacitance = parseFloat(document.getElementById('capacitance').value) || 0;
+            const frequency = parseFloat(document.getElementById('frequency').value);
+            
+            // Calculate resistive leakage current (mA)
+            const resistiveLeakage = (voltage / (resistance * 1000000)) * 1000;
+            
+            // Calculate capacitive leakage current (mA)
+            const capacitiveLeakage = voltage * 2 * Math.PI * frequency * (capacitance / 1000000) * 1000;
+            
+            // Total leakage current
+            const totalLeakage = resistiveLeakage + capacitiveLeakage;
+            
+            let safetyStatus = '';
+            let statusClass = '';
+            
+            if (totalLeakage <= 30) {
+                safetyStatus = '✅ AMAN - Sesuai standar RCD 30mA';
+                statusClass = 'safe';
+            } else if (totalLeakage <= 500) {
+                safetyStatus = '⚠️ HATI-HATI - Perlu evaluasi sistem proteksi';
+                statusClass = 'warning';
+            } else {
+                safetyStatus = '🚨 BAHAYA - Melebihi batas aman!';
+                statusClass = 'danger';
+            }
+            
+            document.getElementById('earthLeakageOutput').innerHTML = `
+                <p><strong>Arus Bocor Resistif:</strong> ${resistiveLeakage.toFixed(3)} mA</p>
+                <p><strong>Arus Bocor Kapasitif:</strong> ${capacitiveLeakage.toFixed(3)} mA</p>
+                <p><strong>Total Arus Bocor:</strong> ${totalLeakage.toFixed(3)} mA</p>
+                <div class="warning" style="background: ${statusClass === 'safe' ? '#48bb78' : statusClass === 'warning' ? '#ed8936' : '#f56565'}">
+                    ${safetyStatus}
+                </div>
+            `;
+            
+            document.getElementById('earthLeakageResult').classList.add('show');
+        });
+
+        // Short Circuit Calculator
+        document.getElementById('shortCircuitForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const systemVoltage = parseFloat(document.getElementById('systemVoltage').value);
+            const sourceImpedance = parseFloat(document.getElementById('sourceImpedance').value);
+            const cableLength = parseFloat(document.getElementById('cableLength').value);
+            const cableImpedance = parseFloat(document.getElementById('cableImpedance').value);
+            
+            // Calculate total impedance
+            const totalImpedance = sourceImpedance + (cableImpedance * cableLength / 1000);
+            
+            // Calculate short circuit current (kA)
+            const shortCircuitCurrent = systemVoltage / totalImpedance / 1000;
+            
+            // Calculate fault power (MVA)
+            const faultPower = (systemVoltage * shortCircuitCurrent * Math.sqrt(3)) / 1000;
+            
+            let recommendation = '';
+            if (shortCircuitCurrent < 1) {
+                recommendation = '💡 MCB standar sudah cukup untuk proteksi';
+            } else if (shortCircuitCurrent < 10) {
+                recommendation = '⚡ Gunakan MCB dengan breaking capacity tinggi atau MCCB';
+            } else {
+                recommendation = '🚨 Diperlukan MCCB atau ACB dengan breaking capacity sangat tinggi';
+            }
+            
+            document.getElementById('shortCircuitOutput').innerHTML = `
+                <p><strong>Impedansi Total:</strong> ${totalImpedance.toFixed(4)} Ω</p>
+                <p><strong>Arus Short Circuit:</strong> ${shortCircuitCurrent.toFixed(2)} kA</p>
+                <p><strong>Fault Power:</strong> ${faultPower.toFixed(2)} MVA</p>
+                <div class="warning" style="background: #4299e1;">
+                    ${recommendation}
+                </div>
+            `;
+            
+            document.getElementById('shortCircuitResult').classList.add('show');
+        });
+
+        // Protective Device Rating Calculator
+        document.getElementById('protectiveForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loadCurrent = parseFloat(document.getElementById('loadCurrent').value);
+            const diversityFactor = parseFloat(document.getElementById('diversityFactor').value);
+            const safetyFactor = parseFloat(document.getElementById('safetyFactor').value);
+            const deviceType = document.getElementById('deviceType').value;
+            
+            // Calculate required rating
+            const designCurrent = loadCurrent * diversityFactor;
+            const requiredRating = designCurrent * safetyFactor;
+            
+            // Standard ratings
+            const standardRatings = [6, 10, 13, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000];
+            
+            // Find next higher standard rating
+            const selectedRating = standardRatings.find(rating => rating >= requiredRating) || requiredRatings;
+            
+            let deviceInfo = '';
+            switch(deviceType) {
+                case 'mcb':
+                    deviceInfo = 'MCB - Untuk proteksi beban rumah tangga dan komersial kecil';
+                    break;
+                case 'mccb':
+                    deviceInfo = 'MCCB - Untuk proteksi beban industri dan komersial besar';
+                    break;
+                case 'fuse':
+                    deviceInfo = 'Fuse - Proteksi ekonomis dengan karakteristik waktu-arus tetap';
+                    break;
+                case 'rcd':
+                    deviceInfo = 'RCD - Proteksi dari arus bocor, biasanya 30mA untuk hunian';
+                    break;
+            }
+            
+            document.getElementById('protectiveOutput').innerHTML = `
+                <p><strong>Arus Desain:</strong> ${designCurrent.toFixed(2)} A</p>
+                <p><strong>Rating Minimum:</strong> ${requiredRating.toFixed(2)} A</p>
+                <p><strong>Rating Standar Dipilih:</strong> ${selectedRating} A</p>
+                <p><strong>Jenis Device:</strong> ${deviceInfo}</p>
+                <div class="warning" style="background: #48bb78;">
+                    ✅ Gunakan ${deviceType.toUpperCase()} ${selectedRating}A
+                </div>
+            `;
+            
+            document.getElementById('protectiveResult').classList.add('show');
+        });
+
+        // Grounding Resistance Calculator
+        document.getElementById('groundingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const rodLength = parseFloat(document.getElementById('rodLength').value);
+            const rodDiameter = parseFloat(document.getElementById('rodDiameter').value) / 1000; // Convert mm to m
+            const soilResistivity = parseFloat(document.getElementById('soilResistivity').value);
+            const burialDepth = parseFloat(document.getElementById('burialDepth').value);
+            
+            // Calculate grounding resistance using simplified formula
+            const resistance = (soilResistivity / (2 * Math.PI * rodLength)) * Math.log((8 * rodLength / rodDiameter) - 1);
+            
+            // Adjustment for burial depth
+            const adjustedResistance = resistance * (1 + burialDepth / rodLength);
+            
+            let safetyStatus = '';
+            if (adjustedResistance <= 1) {
+                safetyStatus = '🌟 EXCELLENT - Cocok untuk instalasi sensitif';
+            } else if (adjustedResistance <= 5) {
+                safetyStatus = '✅ BAIK - Memenuhi standar umum';
+            } else if (adjustedResistance <= 10) {
+                safetyStatus = '⚠️ MARGINAL - Perlu perbaikan sistem grounding';
+            } else {
+                safetyStatus = '🚨 TIDAK MEMADAI - Perlu sistem grounding tambahan';
+            }
+            
+            // Calculate number of rods needed for 5Ω target
+            const rodsNeeded = Math.ceil(adjustedResistance / 5);
+            
+            document.getElementById('groundingOutput').innerHTML = `
+                <p><strong>Resistansi Grounding:</strong> ${adjustedResistance.toFixed(2)} Ω</p>
+                <p><strong>Jumlah Rod untuk 5Ω:</strong> ${rodsNeeded} rod(s)</p>
+                <p><strong>Resistansi dengan ${rodsNeeded} rod:</strong> ${(adjustedResistance / rodsNeeded).toFixed(2)} Ω</p>
+                <div class="warning" style="background: ${adjustedResistance <= 5 ? '#48bb78' : '#ed8936'}">
+                    ${safetyStatus}
+                </div>
+            `;
+            
+            document.getElementById('groundingResult').classList.add('show');
+        });
+
+        // Cable Current Capacity Calculator
+        document.getElementById('cableForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const cableSize = parseFloat(document.getElementById('cableSize').value);
+            const installationMethod = document.getElementById('installationMethod').value;
+            const ambientTemp = parseFloat(document.getElementById('ambientTemp').value);
+            const groupingFactor = parseFloat(document.getElementById('groupingFactor').value);
+            
+            // Base current capacity (simplified calculation)
+            let baseCapacity;
+            if (cableSize <= 1.5) {
+                baseCapacity = cableSize * 10;
+            } else if (cableSize <= 4) {
+                baseCapacity = cableSize * 8;
+            } else if (cableSize <= 10) {
+                baseCapacity = cableSize * 6;
+            } else {
+                baseCapacity = cableSize * 4.5;
+            }
+            
+            // Installation method factor
+            let installationFactor;
+            switch(installationMethod) {
+                case 'enclosed':
+                    installationFactor = 0.8;
+                    break;
+                case 'open':
+                    installationFactor = 1.0;
+                    break;
+                case 'buried':
+                    installationFactor = 1.2;
+                    break;
+                default:
+                    installationFactor = 0.8;
+            }
+            
+            // Temperature derating factor
+            const tempFactor = ambientTemp <= 30 ? 1.0 : 1.0 - ((ambientTemp - 30) * 0.01);
+            
+            // Calculate final current capacity
+            const currentCapacity = baseCapacity * installationFactor * tempFactor * groupingFactor;
+            
+            let recommendation = '';
+            if (currentCapacity >= 30) {
+                recommendation = '✅ Kapasitas tinggi - Cocok untuk beban berat';
+            } else if (currentCapacity >= 15) {
+                recommendation = '👍 Kapasitas sedang - Cocok untuk beban rumah tangga';
+            } else {
+                recommendation = '⚠️ Kapasitas rendah - Hanya untuk beban ringan';
+            }
+            
+            document.getElementById('cableOutput').innerHTML = `
+                <p><strong>Kapasitas Dasar:</strong> ${baseCapacity.toFixed(1)} A</p>
+                <p><strong>Faktor Instalasi:</strong> ${installationFactor}</p>
+                <p><strong>Faktor Suhu:</strong> ${tempFactor.toFixed(2)}</p>
+                <p><strong>Faktor Pengelompokan:</strong> ${groupingFactor}</p>
+                <p><strong>Kapasitas Akhir:</strong> ${currentCapacity.toFixed(1)} A</p>
+                <div class="warning" style="background: #4299e1;">
+                    ${recommendation}
+                </div>
+            `;
+            
+            document.getElementById('cableResult').classList.add('show');
+        });
+
+        // Voltage Drop Calculator
+        document.getElementById('voltageDropForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const current = parseFloat(document.getElementById('current').value);
+            const distance = parseFloat(document.getElementById('distance').value);
+            const conductorSize = parseFloat(document.getElementById('conductorSize').value);
+            const powerFactor = parseFloat(document.getElementById('powerFactor').value);
+            const phaseType = document.getElementById('phaseType').value;
+            
+            // Resistance per meter (simplified - copper conductor)
+            const resistancePerMeter = 0.0175 / conductorSize; // Ω/m
+            const reactancePerMeter = 0.0001; // Simplified reactance
+            
+            // Calculate voltage drop
+            let voltageDrop;
+            if (phaseType === 'single') {
+                voltageDrop = 2 * current * distance * (resistancePerMeter * powerFactor + reactancePerMeter * Math.sin(Math.acos(powerFactor)));
+            } else {
+                voltageDrop = Math.sqrt(3) * current * distance * (resistancePerMeter * powerFactor + reactancePerMeter * Math.sin(Math.acos(powerFactor)));
+            }
+            
+            // Calculate percentage drop (assuming 220V for single phase, 380V for three phase)
+            const nominalVoltage = phaseType === 'single' ? 220 : 380;
+            const voltageDropPercent = (voltageDrop / nominalVoltage) * 100;
+            
+            let safetyStatus = '';
+            if (voltageDropPercent <= 3) {
+                safetyStatus = '✅ BAIK - Memenuhi standar untuk pencahayaan';
+            } else if (voltageDropPercent <= 5) {
+                safetyStatus = '⚠️ BATAS - OK untuk motor, tidak untuk pencahayaan';
+            } else {
+                safetyStatus = '🚨 MELEBIHI BATAS - Perlu kabel lebih besar';
+            }
+            
+            document.getElementById('voltageDropOutput').innerHTML = `
+                <p><strong>Voltage Drop:</strong> ${voltageDrop.toFixed(2)} V</p>
+                <p><strong>Persentase Drop:</strong> ${voltageDropPercent.toFixed(2)}%</p>
+                <p><strong>Tegangan Akhir:</strong> ${(nominalVoltage - voltageDrop).toFixed(1)} V</p>
+                <p><strong>Resistansi Kabel:</strong> ${(resistancePerMeter * distance).toFixed(4)} Ω</p>
+                <div class="warning" style="background: ${voltageDropPercent <= 3 ? '#48bb78' : voltageDropPercent <= 5 ? '#ed8936' : '#f56565'}">
+                    ${safetyStatus}
+                </div>
+            `;
+            
+            document.getElementById('voltageDropResult').classList.add('show');
+        });
+
+        // Add smooth scrolling and animation effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on load
+            const cards = document.querySelectorAll('.calculator-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Add input validation and real-time feedback
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.style.borderColor = '#f56565';
+                } else {
+                    this.style.borderColor = '#e2e8f0';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

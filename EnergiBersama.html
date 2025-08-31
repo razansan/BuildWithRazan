@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnergiBersama - Solar PV & Biogas Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #075e54, #128c7e, #25d366);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Sticky Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+        }
+        
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-online {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        
+        .status-issue {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .metric-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .summary-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .controls {
+            margin-top: 30px;
+        }
+        
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .button-primary {
+            background-color: #2ecc71;
+        }
+        
+        .button-primary:hover {
+            background-color: #27ae60;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .control-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .control-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2ecc71;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .reports {
+            margin-top: 30px;
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .report-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .report-icon {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .report-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .report-date {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .report-preview {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        footer {
+            margin-top: 50px;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-stats {
+                flex-direction: column;
+            }
+            
+            .control-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .back-button {
+                top: 16px;
+                right: 16px;
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+        }
+    </style>
+  </head>
+  <body>
+      <!-- Sticky Back Button -->
+      <a href="index.html" class="back-button" id="backButton">Kembali ke Beranda</a>
+
+      <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">EnergiBersama - SMAN 8</div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">Monitoring</a></li>
+                    <li><a href="#">Controlling</a></li>
+                    <li><a href="#">Reports</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Solar PV System</div>
+                    <div class="status status-online">Online - Optimal</div>
+                </div>
+                <div class="metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">4.2 kW</div>
+                        <div class="metric-label">Current Power Generation</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">18.7 kWh</div>
+                        <div class="metric-label">Today's Generation</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">System Efficiency</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">3.1 MWh</div>
+                        <div class="metric-label">Monthly Generation</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <svg width="100%" height="100%" viewBox="0 0 500 200">
+                        <defs>
+                            <linearGradient id="solarGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2ecc71;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#2ecc71;stop-opacity:0.1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,150 C50,120 100,180 150,100 C200,20 250,80 300,40 C350,60 400,30 450,70 L450,200 L0,200 Z" fill="url(#solarGradient)" />
+                        <path d="M0,150 C50,120 100,180 150,100 C200,20 250,80 300,40 C350,60 400,30 450,70" fill="none" stroke="#2ecc71" stroke-width="2" />
+                        <g>
+                            <text x="0" y="190" font-size="10" fill="rgba(255,255,255,0.7)">06:00</text>
+                            <text x="100" y="190" font-size="10" fill="rgba(255,255,255,0.7)">09:00</text>
+                            <text x="200" y="190" font-size="10" fill="rgba(255,255,255,0.7)">12:00</text>
+                            <text x="300" y="190" font-size="10" fill="rgba(255,255,255,0.7)">15:00</text>
+                            <text x="400" y="190" font-size="10" fill="rgba(255,255,255,0.7)">18:00</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Biogas System</div>
+                    <div class="status status-issue">Online - Attention Required</div>
+                </div>
+                <div class="metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">0.1 m³/h</div>
+                        <div class="metric-label">Current Production Rate</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">2.4 m³</div>
+                        <div class="metric-label">Today's Production</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">98%</div>
+                        <div class="metric-label">System Efficiency</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">64 m³</div>
+                        <div class="metric-label">Monthly Production</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <svg width="100%" height="100%" viewBox="0 0 500 200">
+                        <defs>
+                            <linearGradient id="biogasGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#27ae60;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#27ae60;stop-opacity:0.1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,120 C50,130 100,100 150,110 C200,130 250,70 300,130 C350,150 400,90 450,100 L450,200 L0,200 Z" fill="url(#biogasGradient)" />
+                        <path d="M0,120 C50,130 100,100 150,110 C200,130 250,70 300,130 C350,150 400,90 450,100" fill="none" stroke="#27ae60" stroke-width="2" />
+                        <g>
+                            <text x="0" y="190" font-size="10" fill="rgba(255,255,255,0.7)">00:00</text>
+                            <text x="100" y="190" font-size="10" fill="rgba(255,255,255,0.7)">06:00</text>
+                            <text x="200" y="190" font-size="10" fill="rgba(255,255,255,0.7)">12:00</text>
+                            <text x="300" y="190" font-size="10" fill="rgba(255,255,255,0.7)">18:00</text>
+                            <text x="400" y="190" font-size="10" fill="rgba(255,255,255,0.7)">00:00</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-value">42.8 MWh</div>
+                <div class="stat-label">Total Energi Dihasilkan Tahun Ini</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌲</div>
+                <div class="stat-value">21.4 Ton</div>
+                <div class="stat-label">CO₂ Dihindari</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">Rp 58.2 Jt</div>
+                <div class="stat-label">Penghematan Biaya</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-value">99.2%</div>
+                <div class="stat-label">Uptime System</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="controls-header">
+                <h2>Sistem Kontrol</h2>
+                <button class="button button-primary">Sync Otomatis</button>
+            </div>
+            <div class="control-grid">
+                <div class="control-item">
+                    <div class="control-title">Inverter Solar PV</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-item">
+                    <div class="control-title">Monitoring Jarak Jauh</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-item">
+                    <div class="control-title">Pengisian Baterai</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-item">
+                    <div class="control-title">Biogas Digester</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-item">
+                    <div class="control-title">Biogas Generator</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-item">
+                    <div class="control-title">Mode Optimasi</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="reports">
+            <div class="controls-header">
+                <h2>Laporan Terkini</h2>
+                <button class="button">Lihat Semua Laporan</button>
+            </div>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-icon">📊</div>
+                    <div class="report-title">Laporan Produksi Bulanan</div>
+                    <div class="report-date">29 April 2025</div>
+                    <div class="report-preview">Ringkasan produksi energi Solar PV dan Biogas selama bulan April 2025.</div>
+                </div>
+                <div class="report-card">
+                    <div class="report-icon">⚠️</div>
+                    <div class="report-title">Notifikasi Pemeliharaan</div>
+                    <div class="report-date">27 April 2025</div>
+                    <div class="report-preview">Jadwal pemeliharaan rutin untuk sistem Biogas dijadwalkan pada 5 Mei 2025.</div>
+                </div>
+                <div class="report-card">
+                    <div class="report-icon">📈</div>
+                    <div class="report-title">Analisis Performa Q1</div>
+                    <div class="report-date">15 April 2025</div>
+                    <div class="report-preview">Evaluasi kinerja sistem terintegrasi selama kuartal pertama 2025.</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>©️ 2025 EnergiBersama - By SMAN 8</p>
+        </footer>
+    </div>
+</body>
+</html>
