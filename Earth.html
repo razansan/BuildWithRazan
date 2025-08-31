@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<title>🌍 BMKG Earthquake & Volcano Monitor + ML</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#333}
+  header{background:rgba(255,255,255,.9);padding:20px;text-align:center;font-size:1.5em;font-weight:bold;color:#667eea}
+  .card{background:rgba(255,255,255,.95);border-radius:15px;margin:20px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.1)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+  th{background:#f7f7f7}
+  .badge{padding:4px 8px;border-radius:12px;font-size:.75em;color:#fff}
+  .level-1{background:#2ecc71} .level-2{background:#f1c40f} .level-3{background:#e67e22} .level-4{background:#e74c3c}
+  .btn{background:#667eea;color:#fff;border:none;padding:10px 20px;border-radius:20px;cursor:pointer;margin:5px 0}
+  .btn:hover{opacity:.9}
+</style>
+</head>
+<body>
+<header>🌍 BMKG Earthquake & Volcano Monitor + ML</header>
+
+<!-- Earthquake Section -->
+<div class="card">
+  <h2>📉 Gempabumi Terkini (BMKG)</h2>
+  <button class="btn" onclick="downloadCSV()">📥 Download CSV</button>
+  <table id="eqTable">
+    <thead><tr><th>Waktu</th><th>Magnitude</th><th>Lokasi</th><th>Kedalaman (km)</th><th>Prediksi ML</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Volcano Section -->
+<div class="card">
+  <h2>🌋 Status Gunung Api (BMKG)</h2>
+  <table id="volTable">
+    <thead><tr><th>Gunung</th><th>Level</th><th>Rekomendasi</th><th>Skor Anomali ML</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+/* ---------- CONFIG ---------- */
+const BMKG_EARTHQUAKE = 'https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json';
+const BMKG_VOLCANO    = 'https://data.bmkg.go.id/volcano/api/volcano/level';
+
+/* ---------- UTIL ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const fmt = d => new Date(d).toLocaleString('id-ID');
+
+/* ---------- ML MODEL ---------- */
+// Very small 1-D CNN (converted to TF-JS layers)
+const buildModel = () => {
+  const model = tf.sequential();
+  model.add(tf.layers.conv1d({inputShape:[128,1], filters:8, kernelSize:3, activation:'relu'}));
+  model.add(tf.layers.maxPooling1d({poolSize:2}));
+  model.add(tf.layers.flatten());
+  model.add(tf.layers.dense({units:16, activation:'relu'}));
+  model.add(tf.layers.dense({units:2, activation:'softmax'})); // earthquake / noise
+  model.compile({loss:'categoricalCrossentropy', optimizer:'adam'});
+  return model;
+};
+
+let mlModel;
+(async () => {
+  mlModel = buildModel();
+  // Dummy weights – in production load from URL
+  await mlModel.predict(tf.zeros([1,128,1])).data(); // warm up
+})();
+
+/* ---------- EARTHQUAKE ---------- */
+async function fetchEarthquake() {
+  const res = await fetch(BMKG_EARTHQUAKE);
+  const data = await res.json();
+  const info = data.Infogempa.gempa;
+  // Dummy ML prediction (replace with actual inference)
+  const pred = Math.random() > 0.8 ? '✅ Gempa' : '❌ Bising';
+  const row = `<tr>
+      <td>${fmt(info.DateTime)}</td>
+      <td>${info.Magnitude}</td>
+      <td>${info.Wilayah}</td>
+      <td>${info.Kedalaman}</td>
+      <td>${pred}</td>
+  </tr>`;
+  $('#eqTable tbody').insertAdjacentHTML('afterbegin', row);
+  // Alert if big earthquake
+  if (parseFloat(info.Magnitude) >= 5.5) {
+    Swal.fire({
+      title: '⚠️ Gempa Kuat Terdeteksi!',
+      text: `M ${info.Magnitude} di ${info.Wilayah}`,
+      icon: 'warning',
+      confirmButtonText: 'OK'
+    });
+    playAlert();
+  }
+}
+
+/* ---------- VOLCANO ---------- */
+async function fetchVolcano() {
+  const res = await fetch(BMKG_VOLCANO);
+  const list = await res.json();
+  let html = '';
+  list.data.forEach(v => {
+    const anomalyScore = (Math.random() * 100).toFixed(1); // dummy ML anomaly
+    html += `<tr>
+        <td>${v.gunung}</td>
+        <td><span class="badge level-${v.level}">Level ${v.level}</span></td>
+        <td>${v.rekomendasi}</td>
+        <td>${anomalyScore}</td>
+    </tr>`;
+  });
+  $('#volTable tbody').innerHTML = html;
+}
+
+/* ---------- CSV EXPORT ---------- */
+function downloadCSV() {
+  const rows = [['Waktu','Magnitude','Lokasi','Kedalaman','Prediksi ML']];
+  $$('#eqTable tbody tr').forEach(r => {
+    const cells = r.querySelectorAll('td');
+    rows.push([cells[0].textContent, cells[1].textContent, cells[2].textContent, cells[3].textContent, cells[4].textContent]);
+  });
+  let csvContent = rows.map(e => e.join(',')).join('\n');
+  const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `earthquake-${Date.now()}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/* ---------- ALERT SOUND ---------- */
+function playAlert() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, ctx.currentTime);
+  osc.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.5);
+}
+
+/* ---------- INITIAL & LOOP ---------- */
+fetchEarthquake();
+fetchVolcano();
+setInterval(fetchEarthquake, 60000); // refresh setiap 60 detik
+setInterval(fetchVolcano, 300000);   // refresh setiap 5 menit
+</script>
+</body>
+</html>
