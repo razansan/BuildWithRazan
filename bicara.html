@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BICARA: Aplikasi Pendukung Komunikasi Anak dengan Autisme</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #2196F3;
+            --light-blue: #BBDEFB;
+            --dark-text: #212121;
+            --white: #ffffff;
+            --shadow: rgba(33, 150, 243, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Sticky Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .back-button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1976D2 100%);
+            color: var(--white);
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Gallery Section */
+        .gallery {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .gallery-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .carousel-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 400px;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: var(--white);
+        }
+
+        .features {
+            padding-left: 20px;
+        }
+
+        .features h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 32px;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: var(--light-blue);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .feature-icon::before {
+            content: '✓';
+            color: var(--white);
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .feature-text h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-text);
+        }
+
+        .feature-text p {
+            color: var(--dark-text);
+            opacity: 0.8;
+        }
+
+        /* Description Section */
+        .description {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .description h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .description-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .description p {
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+            text-align: justify;
+        }
+
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .benefit-item {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .benefit-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            color: var(--white);
+        }
+
+        .benefit-item h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark-text);
+        }
+
+        .benefit-item p {
+            color: var(--dark-text);
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* Floating Hire Me Button */
+        .hire-me-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-blue);
+            color: var(--white);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px var(--shadow);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hire-me-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px var(--shadow);
+        }
+
+        /* Contact Form Overlay */
+        .form-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .form-overlay.active {
+            display: flex;
+        }
+
+        .contact-form {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .form-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark-text);
+        }
+
+        .contact-form h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-submit {
+            width: 100%;
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: var(--white);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .back-button {
+                top: 16px;
+                right: 16px;
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+
+            .hero {
+                padding: 100px 0 60px;
+            }
+
+            .gallery-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .features {
+                padding-left: 0;
+            }
+
+            .features h2 {
+                font-size: 2rem;
+                text-align: center;
+            }
+
+            .benefits {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-form {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .hire-me-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 70px;
+                height: 70px;
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 14px 28px;
+                font-size: 16px;
+            }
+
+            .carousel {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Back Button -->
+    <a href="index.html" class="back-button" id="backButton">Kembali ke Beranda</a>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <h1>BICARA</h1>
+                <p class="subtitle">Aplikasi Pendukung Komunikasi Anak dengan Autisme<br>Membantu setiap anak menemukan suara mereka</p>
+                <a href="#gallery" class="cta-button">Coba BICARA Sekarang</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery fade-in" id="gallery">
+        <div class="container">
+            <div class="gallery-content">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <div class="carousel-slide active">
+                            <img src="./portofolio1.jpeg" alt="BICARA App Interface - Main Screen" loading="lazy">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="./portofolio2.jpeg" alt="BICARA App Interface - Communication Features" loading="lazy">
+                        </div>
+                        <div class="carousel-indicators">
+                            <div class="indicator active" data-slide="0"></div>
+                            <div class="indicator" data-slide="1"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="features">
+                    <h2>Fitur Unggulan</h2>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon"></div>
+                            <div class="feature-text">
+                                <h3>Komunikasi Visual</h3>
+                                <p>Interface yang mudah dipahami dengan simbol dan gambar yang jelas</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"></div>
+                            <div class="feature-text">
+                                <h3>Personalization</h3>
+                                <p>Kustomisasi konten sesuai kebutuhan dan kemampuan setiap anak</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"></div>
+                            <div class="feature-text">
+                                <h3>Progress Tracking</h3>
+                                <p>Pemantauan perkembangan komunikasi anak secara real-time</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"></div>
+                            <div class="feature-text">
+                                <h3>Family Support</h3>
+                                <p>Panduan dan dukungan untuk keluarga dalam mendampingi anak</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Description Section -->
+    <section class="description fade-in">
+        <div class="container">
+            <div class="description-content">
+                <h2>Deskripsi Lengkap</h2>
+                <p>BICARA adalah aplikasi inovatif yang dirancang khusus untuk mendukung komunikasi anak-anak dengan autisme. Dengan pendekatan yang berpusat pada pengguna, aplikasi ini menyediakan berbagai alat komunikasi yang mudah digunakan dan dapat disesuaikan dengan kebutuhan individual setiap anak. Melalui teknologi yang ramah pengguna dan desain yang inklusif, BICARA membantu membuka pintu komunikasi yang lebih efektif antara anak dengan autisme dan lingkungan sekitarnya.</p>
+                
+                <div class="benefits">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">💬</div>
+                        <h3>AAC (Augmentative and Alternative Communication)</h3>
+                        <p>Sistem komunikasi alternatif yang memungkinkan anak mengekspresikan kebutuhan dan perasaan mereka</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">👶</div>
+                        <h3>UI Ramah Anak</h3>
+                        <p>Desain antarmuka yang intuitif, colorful, dan mudah dipahami oleh anak-anak dengan berbagai tingkat kemampuan</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">📱</div>
+                        <h3>Offline Mode</h3>
+                        <p>Fungsionalitas penuh tanpa memerlukan koneksi internet, memastikan aksesibilitas di mana saja</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Hire Me Button -->
+    <button class="hire-me-btn" id="hireMeBtn" title="Hire Me">💼</button>
+
+    <!-- Contact Form Overlay -->
+    <div class="form-overlay" id="formOverlay">
+        <div class="contact-form">
+            <button class="form-close" id="formClose">&times;</button>
+            <h2>Hubungi Saya</h2>
+            <form id="contactForm" action="mailto:razanmuhammad5334@gmail.com" method="post" enctype="text/plain">
+                <div class="form-group">
+                    <label for="name">Nama</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Pesan</label>
+                    <textarea id="message" name="message" required placeholder="Tulis pesan Anda di sini..."></textarea>
+                </div>
+                <button type="submit" class="form-submit">Kirim ke razanmuhammad5334@gmail.com</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden iframe for form submission -->
+    <iframe name="hidden_iframe" style="display: none;"></iframe>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Pesan berhasil dikirim!</div>
+
+    <script>
+        // Carousel functionality
+        class Carousel {
+            constructor() {
+                this.slides = document.querySelectorAll('.carousel-slide');
+                this.indicators = document.querySelectorAll('.indicator');
+                this.currentSlide = 0;
+                this.interval = null;
+                this.init();
+            }
+
+            init() {
+                this.startAutoSlide();
+                this.bindEvents();
+            }
+
+            startAutoSlide() {
+                this.interval = setInterval(() => {
+                    this.nextSlide();
+                }, 4000);
+            }
+
+            stopAutoSlide() {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                }
+            }
+
+            nextSlide() {
+                this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+                this.updateSlide();
+            }
+
+            goToSlide(index) {
+                this.currentSlide = index;
+                this.updateSlide();
+            }
+
+            updateSlide() {
+                this.slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === this.currentSlide);
+                });
+                this.indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            bindEvents() {
+                const carousel = document.querySelector('.carousel');
+                
+                carousel.addEventListener('mouseenter', () => {
+                    this.stopAutoSlide();
+                });
+
+                carousel.addEventListener('mouseleave', () => {
+                    this.startAutoSlide();
+                });
+
+                this.indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => {
+                        this.goToSlide(index);
+                    });
+                });
+            }
+        }
+
+        // Scroll animations
+        function initScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            elements.forEach(element => {
+                observer.observe(element);
+            });
+        }
+
+        // Back button functionality
+        function initSmoothScroll() {
+            const backButton = document.getElementById('backButton');
+            
+            // Remove the event listener that was preventing navigation
+            // The button will now work as a normal link to index.html
+        }
+
+        // Contact form functionality
+        function initContactForm() {
+            const hireMeBtn = document.getElementById('hireMeBtn');
+            const formOverlay = document.getElementById('formOverlay');
+            const formClose = document.getElementById('formClose');
+            const contactForm = document.getElementById('contactForm');
+            const toast = document.getElementById('toast');
+
+            // Open form
+            hireMeBtn.addEventListener('click', () => {
+                formOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close form
+            function closeForm() {
+                formOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            formClose.addEventListener('click', closeForm);
+            formOverlay.addEventListener('click', (e) => {
+                if (e.target === formOverlay) {
+                    closeForm();
+                }
+            });
+
+            // Form submission
+            contactForm.addEventListener('submit', (e) => {
+                // Allow default mailto behavior
+                // The form will open user's default email client
+                
+                // Show success toast
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+
+                // Close form after a short delay
+                setTimeout(() => {
+                    closeForm();
+                    contactForm.reset();
+                }, 1000);
+            });
+
+            // Close form on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && formOverlay.classList.contains('active')) {
+                    closeForm();
+                }
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new Carousel();
+            initScrollAnimations();
+            initSmoothScroll();
+            initContactForm();
+        });
+    </script>
+</body>
+</html>
